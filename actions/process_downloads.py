@@ -6,12 +6,22 @@ import tkinter.messagebox as messagebox
 
 from actions.config import DOWNLOADS_DIR_NAME
 
+_overwrite_prompt_cache = {}
+
+
 def prompt_user_overwrite(dest_path):
-    # Placeholder for the user prompt function to overwrite files
-    # Returns True to overwrite, False otherwise
-    print(f"File {dest_path} already exists. Prompting user for overwrite.")
-    # Replace with actual user prompt logic
-    return True  # Default behavior for this example
+    """Ask the user to confirm overwriting a file conflict."""
+    normalized_path = os.path.abspath(dest_path)
+    if normalized_path in _overwrite_prompt_cache:
+        return _overwrite_prompt_cache[normalized_path]
+
+    prompt_message = (
+        f"{normalized_path} already exists.\n\n"
+        "Do you want to overwrite it?"
+    )
+    should_overwrite = messagebox.askyesno("Process Downloads", prompt_message)
+    _overwrite_prompt_cache[normalized_path] = should_overwrite
+    return should_overwrite
 
 def move_or_merge(src, dest):
     """Move or merge a directory/file, asking for overwrite only on file conflicts."""
@@ -32,6 +42,7 @@ def move_or_merge(src, dest):
                 shutil.move(src, dest)
                 print(f"Overwritten file: {dest}")
             else:
+                os.remove(src)
                 print(f"Skipped file: {dest}")
         else:
             shutil.move(src, dest)
