@@ -1,8 +1,11 @@
 import os
 import tkinter.messagebox as messagebox
 
+from actions.config import DOWNLOADS_DIR_NAME
+
 def clear_downloads_action():
-    output_dir = "Downloads"
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    output_dir = os.path.join(base_dir, DOWNLOADS_DIR_NAME)
     if os.path.exists(output_dir):
         for file in os.listdir(output_dir):
             file_path = os.path.join(output_dir, file)

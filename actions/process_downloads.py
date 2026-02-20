@@ -3,6 +3,8 @@ import shutil
 import zipfile
 import py7zr
 
+from actions.config import DOWNLOADS_DIR_NAME
+
 def prompt_user_overwrite(dest_path):
     # Placeholder for the user prompt function to overwrite files
     # Returns True to overwrite, False otherwise
@@ -59,7 +61,7 @@ def copy_or_merge(src, dest):
 def process_downloads_action():
     # Set directories
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
-    downloads_dir = os.path.join(base_dir, "Downloads")
+    downloads_dir = os.path.join(base_dir, DOWNLOADS_DIR_NAME)
     output_dir = os.path.join(base_dir, "Output")
     processing_dir = os.path.join(base_dir, "Processing")
 

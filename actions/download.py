@@ -5,7 +5,9 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from tqdm import tqdm
 
-def download_github_release(repo, pattern, output_dir="downloads", token=None):
+from actions.config import DOWNLOADS_DIR_NAME
+
+def download_github_release(repo, pattern, output_dir=DOWNLOADS_DIR_NAME, token=None):
     """
     Downloads all release assets matching a pattern from a GitHub repository.
 
