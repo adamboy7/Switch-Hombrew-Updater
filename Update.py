@@ -3,12 +3,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from dotenv import load_dotenv
 import os
-from actions.clear_downloads import clear_downloads_action
+from actions.clear_downloads import clear_downloads_action, clear_downloads_contents
 from actions.add_repository import add_repository_action
 from actions.add_github_token import add_github_token_action
 from actions.process_downloads import process_downloads_action
 from actions.download import start_download
-from actions.config import load_config
+from actions.config import DOWNLOADS_DIR_NAME, get_project_root, load_config
 
 class App(tk.Tk):
     def __init__(self, files_to_download, github_token=None):
@@ -19,6 +19,14 @@ class App(tk.Tk):
 
         self.title("GitHub Release Downloader")
         self.geometry("600x400")
+
+        icon_path = os.path.join(get_project_root(), "Switch-updater.ico")
+        if os.path.exists(icon_path):
+            try:
+                self.iconbitmap(icon_path)
+            except tk.TclError:
+                # Keep running if this platform does not support .ico window icons.
+                pass
 
         # Repo names can repeat across config entries, so repo-only keys can overwrite checkbox state.
         self.check_vars = {}
@@ -72,12 +80,33 @@ class App(tk.Tk):
 
         self.config(menu=menu_bar)
 
+    def _downloads_has_content(self):
+        downloads_dir = os.path.join(get_project_root(), DOWNLOADS_DIR_NAME)
+        return os.path.isdir(downloads_dir) and bool(os.listdir(downloads_dir))
+
+    def _confirm_existing_downloads_behavior(self):
+        prompt_message = (
+            "Files already exist in Downloads.\n\n"
+            "Yes = Download anyways (overwrite/merge into existing files).\n"
+            "No = Clear downloads before downloading.\n"
+            "Cancel = Stop and keep current files."
+        )
+        selection = messagebox.askyesnocancel("Downloads Already Exist", prompt_message)
+        if selection is None:
+            return False
+        if selection is False:
+            clear_downloads_contents(show_message=False)
+        return True
+
     def download_selected(self):
         selected_files = [
             file for item_id, file in self.displayed_items if self.check_vars.get(item_id) and self.check_vars[item_id].get()
         ]
         if not selected_files:
             messagebox.showwarning("No Selection", "No files selected for download.")
+            return
+
+        if self._downloads_has_content() and not self._confirm_existing_downloads_behavior():
             return
 
         start_download(selected_files, self.github_token)
