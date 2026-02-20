@@ -2,6 +2,8 @@ import tkinter as tk
 import tkinter.messagebox as messagebox
 from dotenv import set_key
 
+from actions.config import get_env_path
+
 def add_github_token_action():
     token_window = tk.Toplevel()
     token_window.title("Add GitHub Token")
@@ -14,7 +16,7 @@ def add_github_token_action():
     def save_token():
         token = token_entry.get().strip()
         token = token if token else "None"
-        set_key(".env", "GITHUB_TOKEN", token)
+        set_key(get_env_path(), "GITHUB_TOKEN", token)
         messagebox.showinfo("GitHub Token", "GitHub token updated successfully.")
         token_window.destroy()
 

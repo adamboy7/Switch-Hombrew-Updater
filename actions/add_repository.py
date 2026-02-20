@@ -1,6 +1,8 @@
 import tkinter as tk
 import tkinter.messagebox as messagebox
 
+from actions.config import get_config_path
+
 def add_repository_action():
     add_window = tk.Toplevel()
     add_window.title("Add Repository")
@@ -18,7 +20,7 @@ def add_repository_action():
         repo = repo_entry.get().strip()
         pattern = pattern_entry.get().strip() or None
         if repo:
-            with open("config.txt", "a") as config_file:
+            with open(get_config_path("config.txt"), "a") as config_file:
                 config_file.write(f"{repo}:{pattern}\\n" if pattern else f"{repo}\\n")
             messagebox.showinfo("Add Repository", "Repository added successfully.")
             add_window.destroy()

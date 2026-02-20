@@ -2,7 +2,19 @@ import os
 
 DOWNLOADS_DIR_NAME = "Downloads"
 
-def load_config(config_file="../config.txt"):
+
+def get_project_root():
+    """Return the absolute path to the project root directory."""
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+
+
+def get_config_path(config_file="config.txt"):
+    """Return an absolute path to the configuration file."""
+    if os.path.isabs(config_file):
+        return config_file
+    return os.path.join(get_project_root(), config_file)
+
+def load_config(config_file="config.txt"):
     """
     Load repositories and patterns from a configuration file.
 
@@ -10,7 +22,7 @@ def load_config(config_file="../config.txt"):
     :return: List of repositories and patterns.
     """
     files_to_download = []
-    config_path = os.path.abspath(config_file)
+    config_path = get_config_path(config_file)
     
     if not os.path.exists(config_path):
         print(f"Config file '{config_path}' not found. Exiting.")
@@ -31,11 +43,11 @@ def load_config(config_file="../config.txt"):
 
 def get_env_path():
     """
-    Get the path to the .env file in the parent directory.
+    Get the path to the .env file in the project root directory.
 
     :return: Path to the .env file.
     """
-    env_path = os.path.abspath("../.env")
+    env_path = os.path.join(get_project_root(), ".env")
     if not os.path.exists(env_path):
         with open(env_path, "w") as env_file:
             env_file.write("GITHUB_TOKEN=None\n")
