@@ -1,0 +1,13 @@
+atmosphere-nx/atmosphere:atmosphere-*-*-*+hbl-*+hbmenu-*.zip
+ctcaer/hekate:hekate_ctcaer_*_Nyx_*.zip
+ndeadly/MissionControl:MissionControl-*-*-*.zip
+spacemeowx2/ldn_mitm:ldn_mitm_v*.zip
+olliz0r/sys-botbase:sys-botbase*.zip
+exelix11/SysDVR:SysDVR.zip
+WerWolv/nx-ovlloader:nx-ovlloader.zip
+WerWolv/Tesla-Menu:ovlmenu.zip
+3096/luxray:luxray-*-ovlloader.zip
+averne/SpaceCadetPinball-NX:SpaceCadetPinball.zip
+XITRIX/Moonlight-Switch:Moonlight-Switch.nro
+RSDuck/melonDS
+mgba-emu/mgba:mGBA-*-switch.7z
