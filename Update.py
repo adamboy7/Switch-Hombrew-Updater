@@ -19,12 +19,23 @@ class App(tk.Tk):
 
         self.title("GitHub Release Downloader")
         self.geometry("600x400")
+        self.set_window_icon()
 
         # Repo names can repeat across config entries, so repo-only keys can overwrite checkbox state.
         self.check_vars = {}
         self.displayed_items = []
         self.create_widgets()
         self.create_menu()
+
+    def set_window_icon(self):
+        icon_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "Switch-updater.ico")
+        if not os.path.exists(icon_path):
+            return
+
+        try:
+            self.iconbitmap(icon_path)
+        except tk.TclError:
+            pass
 
     def create_widgets(self):
         frame = ttk.Frame(self)
