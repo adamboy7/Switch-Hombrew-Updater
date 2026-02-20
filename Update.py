@@ -3,6 +3,7 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 from dotenv import load_dotenv
 import os
+import sys
 from actions.clear_downloads import clear_downloads_action
 from actions.add_repository import add_repository_action
 from actions.add_github_token import add_github_token_action
@@ -101,7 +102,7 @@ def main():
 
     if not files_to_download:
         print("No valid entries found in config file. Exiting.")
-        exit(1)
+        sys.exit(1)
 
     # Load the GitHub token from the environment (Loaded when we ran load_config)
     github_token = os.getenv("GITHUB_TOKEN")
