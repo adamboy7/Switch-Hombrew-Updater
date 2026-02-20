@@ -19,7 +19,10 @@ def download_github_release(repo, pattern, output_dir=DOWNLOADS_DIR_NAME, token=
     api_url = f"https://api.github.com/repos/{repo}/releases/latest"
     headers = {"Authorization": f"token {token}"} if token else {}
 
-    response = requests.get(api_url, headers=headers)
+    api_timeout_seconds = 15
+    asset_timeout_seconds = 60
+
+    response = requests.get(api_url, headers=headers, timeout=api_timeout_seconds)
     if response.status_code != 200:
         print(f"Failed to fetch releases for {repo}: {response.status_code} {response.text}")
         return
@@ -42,16 +45,37 @@ def download_github_release(repo, pattern, output_dir=DOWNLOADS_DIR_NAME, token=
 
             file_path = os.path.join(output_dir, asset_name)
 
-            # Download the file
-            with requests.get(download_url, stream=True) as file_response:
-                total_size = int(file_response.headers.get("content-length", 0))
-                with open(file_path, "wb") as file:
-                    with tqdm(total=total_size, unit="B", unit_scale=True, desc=asset_name) as pbar:
-                        for chunk in file_response.iter_content(chunk_size=8192):
-                            file.write(chunk)
-                            pbar.update(len(chunk))
-            print(f"Downloaded: {file_path}")
-            downloaded_any = True
+            temp_file_path = f"{file_path}.part"
+
+            try:
+                # Download the file
+                with requests.get(
+                    download_url,
+                    headers=headers,
+                    stream=True,
+                    timeout=asset_timeout_seconds,
+                ) as file_response:
+                    file_response.raise_for_status()
+                    total_size = int(file_response.headers.get("content-length", 0))
+                    with open(temp_file_path, "wb") as file:
+                        with tqdm(total=total_size, unit="B", unit_scale=True, desc=asset_name) as pbar:
+                            for chunk in file_response.iter_content(chunk_size=8192):
+                                if not chunk:
+                                    continue
+                                file.write(chunk)
+                                pbar.update(len(chunk))
+
+                os.replace(temp_file_path, file_path)
+                print(f"Downloaded: {file_path}")
+                downloaded_any = True
+            except requests.RequestException as error:
+                print(f"Failed to download asset '{asset_name}' from {repo}: {error}")
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+            except OSError as error:
+                print(f"Failed to save asset '{asset_name}' from {repo}: {error}")
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
 
     if not downloaded_any:
         print(f"No files found matching pattern: {pattern} for {repo}.")
