@@ -71,6 +71,8 @@ def copy_or_merge(src, dest):
             print(f"Copied file: {src} to {dest}")
 
 def process_downloads_action():
+    _overwrite_prompt_cache.clear()
+
     # Set directories
     base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
     downloads_dir = os.path.join(base_dir, DOWNLOADS_DIR_NAME)
@@ -96,8 +98,8 @@ def process_downloads_action():
         if item.lower().endswith(".nro"):
             switch_dir = os.path.join(output_dir, "switch")
             os.makedirs(switch_dir, exist_ok=True)
-            shutil.move(item_path, os.path.join(switch_dir, item))
-            print(f"Moved .NRO file: {item} to Output/switch")
+            shutil.copy2(item_path, os.path.join(switch_dir, item))
+            print(f"Copied .NRO file: {item} to Output/switch")
 
     # Step 1.5: Move .OVL files to Output/switch/.overlays
     for item in os.listdir(downloads_dir):
@@ -105,8 +107,8 @@ def process_downloads_action():
         if item.lower().endswith(".ovl"):
             overlays_dir = os.path.join(output_dir, "switch", ".overlays")
             os.makedirs(overlays_dir, exist_ok=True)
-            shutil.move(item_path, os.path.join(overlays_dir, item))
-            print(f"Moved .OVL file: {item} to Output/switch/.overlays")
+            shutil.copy2(item_path, os.path.join(overlays_dir, item))
+            print(f"Copied .OVL file: {item} to Output/switch/.overlays")
 
     # Step 2: Extract valid archive files into Processing
     for item in os.listdir(downloads_dir):
@@ -116,13 +118,11 @@ def process_downloads_action():
             if item.lower().endswith(".zip"):
                 with zipfile.ZipFile(item_path, 'r') as zip_ref:
                     zip_ref.extractall(extract_dir)
-                os.remove(item_path)
-                print(f"Extracted and removed .zip file: {item}")
+                print(f"Extracted .zip file: {item}")
             elif item.lower().endswith(".7z"):
                 with py7zr.SevenZipFile(item_path, mode='r') as seven_zip:
                     seven_zip.extractall(extract_dir)
-                os.remove(item_path)
-                print(f"Extracted and removed .7z file: {item}")
+                print(f"Extracted .7z file: {item}")
         except Exception as e:
             print(f"Failed to extract {item}: {e}")
 
@@ -162,7 +162,7 @@ def process_downloads_action():
             switch_dir = os.path.join(output_dir, "switch")
             os.makedirs(switch_dir, exist_ok=True)
             print(f"Unprocessed folder {foldername} found, assuming switch homebrew app")
-            shutil.move(folder_path, os.path.join(switch_dir, foldername))
+            copy_or_merge(folder_path, os.path.join(switch_dir, foldername))
 
     # Step 6: Copy contents of Persistent folder to Output
     persistent_dir = os.path.join(base_dir, "Persistent")
