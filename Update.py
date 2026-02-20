@@ -20,7 +20,9 @@ class App(tk.Tk):
         self.title("GitHub Release Downloader")
         self.geometry("600x400")
 
+        # Repo names can repeat across config entries, so repo-only keys can overwrite checkbox state.
         self.check_vars = {}
+        self.displayed_items = []
         self.create_widgets()
         self.create_menu()
 
@@ -32,9 +34,12 @@ class App(tk.Tk):
         label.pack(anchor=tk.W, pady=5)
 
         self.check_vars = {}
-        for file in self.files_to_download:
+        self.displayed_items = []
+        for index, file in enumerate(self.files_to_download):
+            item_id = index
             var = tk.BooleanVar(value=True)
-            self.check_vars[file["repo"]] = var
+            self.check_vars[item_id] = var
+            self.displayed_items.append((item_id, file))
 
             pattern_text = f" ({file['pattern']})" if file.get("pattern") else " (Download All)"
             check = ttk.Checkbutton(
@@ -69,7 +74,7 @@ class App(tk.Tk):
 
     def download_selected(self):
         selected_files = [
-            file for file in self.files_to_download if self.check_vars.get(file["repo"]) and self.check_vars[file["repo"]].get()
+            file for item_id, file in self.displayed_items if self.check_vars.get(item_id) and self.check_vars[item_id].get()
         ]
         if not selected_files:
             messagebox.showwarning("No Selection", "No files selected for download.")
