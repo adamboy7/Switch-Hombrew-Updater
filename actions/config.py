@@ -1,5 +1,7 @@
 import os
 
+DOWNLOADS_DIR_NAME = "Downloads"
+
 def load_config(config_file="../config.txt"):
     """
     Load repositories and patterns from a configuration file.
