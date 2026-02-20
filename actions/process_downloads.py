@@ -2,6 +2,7 @@ import os
 import shutil
 import zipfile
 import py7zr
+import tkinter.messagebox as messagebox
 
 from actions.config import DOWNLOADS_DIR_NAME
 
@@ -72,6 +73,11 @@ def process_downloads_action():
     os.makedirs(output_dir, exist_ok=True)
     os.makedirs(processing_dir, exist_ok=True)
     os.makedirs(os.path.join(output_dir, "switch"), exist_ok=True)
+
+    # Nothing to process if Downloads is missing or empty
+    if not os.path.isdir(downloads_dir) or not os.listdir(downloads_dir):
+        messagebox.showinfo("Process Downloads", "No downloads to process.")
+        return
 
     # Step 1: Move .NRO files to Output/switch
     for item in os.listdir(downloads_dir):
